@@ -50,6 +50,21 @@ class AnimalsTableViewController: UITableViewController {
     
     @IBAction func getAnimals(_ sender: UIBarButtonItem) {
         // fetch all animals from API
+        apiController.fetchAllAnimalNames { (result) in
+            
+            do {
+                let animalNames = try result.get()
+                self.animalNames = animalNames
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                    
+                }
+                
+            } catch {
+                NSLog("Error fetching animalNames: \(error)")
+            }
+        }
     }
     
     // MARK: - Navigation
@@ -61,6 +76,15 @@ class AnimalsTableViewController: UITableViewController {
             if let loginVC = segue.destination as? LoginViewController {
                 loginVC.apiController = apiController
             }
+        } else if segue.identifier == "ShowAnimalDetailSegue" {
+            
+            if let animalDetailVC = segue.destination as? AnimalDetailViewController,
+                let indexPath = tableView.indexPathForSelectedRow {
+                
+                animalDetailVC.apiController = apiController
+                animalDetailVC.animalName = animalNames[indexPath.row]
+            }
+            
         }
     }
 }
